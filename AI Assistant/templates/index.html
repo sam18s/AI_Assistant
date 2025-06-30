@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Assistant</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.59/build/spline-viewer.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-size: cover;
+      background-position: center;
+      background-image: url('../static/tech3.png');
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-attachment: fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    @keyframes radial-background-animation {
+      0% {
+        background-position: 0% 0%;
+      }
+
+      50% {
+        background-position: 50% 50%;
+      }
+
+      100% {
+        background-position: 100% 100%;
+      }
+    }
+
+    h1 {
+      position: absolute;
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 2.5rem;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 3em;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      background-size: 200% 200%;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: wave-animation 4s infinite ease-in-out;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes wave-animation {
+      0% {
+        background-position: 0% 0%;
+      }
+
+      25% {
+        background-position: 50% 100%;
+      }
+
+      50% {
+        background-position: 100% 0%;
+      }
+
+      75% {
+        background-position: 50% 100%;
+      }
+
+      100% {
+        background-position: 0% 0%;
+      }
+    }
+
+    /* Positioning mic button to the left */
+    .mic {
+      position: absolute;
+      top: 70%;
+      right: 20%;
+      transform: translate(0, -50%);
+      color: #fff;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .mic:hover {
+      transform: translate(0, -50%) scale(1.05);
+    }
+
+    /* Styling and animation for mic elements */
+    .mic::before,
+    .mic::after,
+    .mic-shadow {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 100%;
+      z-index: 2;
+      opacity: 0;
+      box-shadow: 0 0 20px 10px rgba(28, 8, 79, 0.4);
+    }
+
+    /* Main circle */
+    .mic::before {
+      width: 100px;
+      height: 100px;
+      background-color: rgba(26, 8, 78, 0.5);
+      animation: pulse-glow 1.2s ease-in-out infinite;
+    }
+
+    /* Inner circle with wavy animation */
+    .mic::after {
+      width: 80px;
+      height: 80px;
+      background-color: rgba(47, 30, 95, 0.6);
+      animation: wave-expand 1.5s linear alternate;
+    }
+
+    /* Mic icon */
+    .mic-icon {
+      box-sizing: border-box;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(4);
+      display: block;
+      width: 12px;
+      height: 10px;
+      border-bottom-left-radius: 120px;
+      border-bottom-right-radius: 120px;
+      border: 2px solid;
+      border-top: 0;
+      margin-top: 10px;
+      z-index: 3;
+    }
+
+    /* Mic icon details */
+    .mic-icon::before,
+    .mic-icon::after {
+      content: "";
+      display: block;
+      box-sizing: border-box;
+      position: absolute;
+    }
+
+    .mic-icon::before {
+      width: 2px;
+      height: 5px;
+      top: calc(100% + 1px);
+      left: 50%;
+      transform: translate(-50%, 0);
+      background-color: #fff;
+    }
+
+    .mic-icon::after {
+      border: 2px solid;
+      width: 5px;
+      height: 12px;
+      left: 50%;
+      top: -5px;
+      border-radius: 4px;
+      transform: translate(-50%, 0);
+    }
+
+    /* Mic shadow */
+    .mic-shadow {
+      width: 150px;
+      height: 150px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border-radius: 100%;
+      z-index: 1;
+      box-shadow: 0 0 20px 10px #823ca6, 0 0 15px 10px #aab3d2, 0 0 10px 10px #5acee3;
+      animation: shadow-breathe 2.5s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    /* Active state for mic */
+    .mic.active::before,
+    .mic.active::after,
+    .mic.active .mic-shadow {
+      opacity: 1;
+    }
+
+    @keyframes pulse-glow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 20px 10px rgba(28, 8, 79, 0.4);
+      }
+
+      50% {
+        box-shadow: 0 0 40px 20px rgba(28, 8, 79, 0.6);
+      }
+    }
+
+    @keyframes wave-expand {
+      0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    @keyframes shadow-breathe {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow: 0 0 20px 10px #d497f0, 0 0 15px 10px #aab3d2, 0 0 10px 10px #d497f0;
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: 0 0 30px 15px #d497f0, 0 0 20px 15px #aab3d2, 0 0 15px 15px #d497f0;
+      }
+    }
+
+    @keyframes mic-bounce {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(4);
+      }
+
+      50% {
+        transform: translate(-50%, -48%) scale(4.1);
+      }
+    }
+
+    /* Transition for smooth clicking effect */
+    .mic.active .mic-icon {
+      animation: mic-bounce 0.8s ease-out infinite;
+    }
+
+    #response {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #fff;
+    }
+
+    .container {
+      position: absolute;
+      top: 40%;
+      right: 10%;
+      transform: translate(0, -50%);
+      width: 500px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      /* backdrop-filter: blur(10px); */
+      border-radius: 10px;
+      box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.3);
+      color: white;
+      font-size: 1.5em;
+      display: none;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .container p {
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .history-toggle-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 999;
+      background: rgba(15, 8, 38, 0.8);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      cursor: pointer;
+      box-shadow: 0 0 10px #5acee3;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-toggle-btn:hover {
+      background: rgba(15, 8, 38, 0.9);
+      transform: translateY(-2px);
+    }
+
+    .history-panel {
+      position: fixed;
+      bottom: 70px;
+      left: 20px;
+      width: 300px;
+      max-height: 300px;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      color: white;
+      font-size: 0.85em;
+      border-radius: 8px;
+      z-index: 998;
+      box-shadow: 0 0 15px #d497f0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .history-panel.hidden {
+      display: none;
+    }
+
+    .history-item {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-bottom: 1px solid rgba(90, 206, 227, 0.3);
+      transition: background 0.3s;
+    }
+
+    .history-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .history-user {
+      color: #5acee3;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .history-ai {
+      color: #d497f0;
+      display: block;
+      margin-top: 5px;
+      padding-left: 15px;
+      position: relative;
+    }
+
+    .history-ai::before {
+      content: "→";
+      position: absolute;
+      left: 0;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .toggle-menu {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .hamburger {
+      font-size: 2em;
+      cursor: pointer;
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #d497f0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hamburger:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .menu-content {
+      position: absolute;
+      top: 50px;
+      left: 0;
+      width: 250px;
+      background: rgba(15, 8, 38, 0.95);
+      backdrop-filter: blur(10px);
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px #aab3d2;
+      display: none;
+      transition: all 0.4s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-content h3 {
+      margin-top: 0;
+      color: #d497f0;
+      font-size: 1.2em;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .menu-content ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .menu-content ul li {
+      margin: 8px 0;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background-color: rgba(255, 255, 255, 0.05);
+      transition: all 0.3s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-content ul li:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #5acee3;
+      transform: translateX(5px);
+    }
+
+    .menu-content ul li ul {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      width: 250px;
+      background-color: rgba(30, 20, 60, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(170, 179, 210, 0.5);
+      display: none;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-content ul li:hover>ul {
+      display: block;
+    }
+
+    .menu-content ul li ul li {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .menu-content ul li ul li:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Profile Section */
+    .profile-section {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+    }
+
+    .profile-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(210, 151, 240, 0.3);
+    }
+
+    .profile-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .profile-btn i {
+      font-size: 1.2em;
+    }
+
+    .profile-dropdown {
+      position: absolute;
+      top: 50px;
+      right: 0;
+      width: 200px;
+      background: rgba(15, 8, 38, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(170, 179, 210, 0.5);
+      padding: 10px 0;
+      display: none;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .profile-dropdown.show {
+      display: block;
+    }
+
+    .profile-dropdown a {
+      display: block;
+      padding: 10px 15px;
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .profile-dropdown a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #5acee3;
+      padding-left: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+        width: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .menu-content {
+        width: 90vw;
+        max-height: 70vh;
+        overflow-y: auto;
+      }
+
+      .container {
+        right: 5%;
+        left: 5%;
+        bottom: 20%;
+        width: 90%;
+      }
+
+      .mic {
+        right: 5%;
+        bottom: 10%;
+        width: 50px;
+        height: 50px;
+      }
+
+      .profile-section {
+        top: 15px;
+        right: 15px;
+      }
+
+      .profile-btn {
+        padding: 6px 12px;
+        font-size: 0.9em;
+      }
+
+      .profile-dropdown {
+        width: 180px;
+      }
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(210, 151, 240, 0.5);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(210, 151, 240, 0.7);
+    }
+  </style>
+
+</head>
+
+<body>
+  <h1>Welcome to Your AI Assistant</h1>
+
+  <!-- Profile Section -->
+  <div class="profile-section">
+    <button class="profile-btn" id="profileBtn">
+      <i class="fas fa-user-circle"></i>
+      <span>Profile</span>
+    </button>
+    <div class="profile-dropdown" id="profileDropdown">
+      <a href="#"><i class="fas fa-user"></i> My Account</a>
+      <a href="#"><i class="fas fa-cog"></i> Settings</a>
+      <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+  </div>
+
+  <div id="toggleMenu" class="toggle-menu">
+    <div class="hamburger" id="hamburger">
+      <i class="fas fa-bars"></i>
+      <span></span>
+    </div>
+    <div class="menu-content" id="menuContent">
+      <h3><i class="fas fa-robot"></i> AI Commands</h3>
+      <ul>
+        <li class="submenu">
+          <i class="fas fa-door-open"></i> Open
+          <ul class="submenu-list">
+            <li onclick="handleCommand('open google')"><i class="fas fa-globe"></i> Google</li>
+            <li onclick="handleCommand('open youtube')"><i class="fab fa-youtube"></i> YouTube</li>
+            <li onclick="handleCommand('open camera')"><i class="fas fa-camera"></i> Camera</li>
+            <li onclick="handleCommand('open notepad')"><i class="fas fa-file-alt"></i> Notepad</li>
+            <li onclick="handleCommand('open file manager')"><i class="fas fa-folder"></i> File Manager</li>
+            <li onclick="handleCommand('open word')"><i class="fas fa-file-word"></i> Word</li>
+            <li onclick="handleCommand('open excel')"><i class="fas fa-file-excel"></i> Excel</li>
+            <li onclick="handleCommand('open chatgpt')"><i class="fas fa-robot"></i> ChatGPT</li>
+            <li onclick="handleCommand('open manipal university')"><i class="fas fa-university"></i> Manipal University
+            </li>
+            <li onclick="handleCommand('open setting')"><i class="fas fa-cog"></i> Setting</li>
+            <li onclick="handleCommand('open paint')"><i class="fas fa-paint-brush"></i> Paint</li>
+            <li onclick="handleCommand('open control panel')"><i class="fas fa-tools"></i> Control Panel</li>
+            <li onclick="handleCommand('open instagram')"><i class="fab fa-instagram"></i> Instagram</li>
+            <li onclick="handleCommand('open github')"><i class="fab fa-github"></i> GitHub</li>
+            <li onclick="handleCommand('open linkdin')"><i class="fab fa-linkedin"></i> LinkedIn</li>
+            <li onclick="handleCommand('open facebook')"><i class="fab fa-facebook"></i> Facebook</li>
+            <li onclick="handleCommand('open amazon')"><i class="fab fa-amazon"></i> Amazon</li>
+          </ul>
+        </li>
+
+        <li class="submenu">
+          <i class="fas fa-door-closed"></i> Close
+          <ul class="submenu-list">
+            <li onclick="handleCommand('close google')"><i class="fas fa-globe"></i> Google</li>
+            <li onclick="handleCommand('close youtube')"><i class="fab fa-youtube"></i> YouTube</li>
+            <li onclick="handleCommand('close camera')"><i class="fas fa-camera"></i> Camera</li>
+            <li onclick="handleCommand('close notepad')"><i class="fas fa-file-alt"></i> Notepad</li>
+            <li onclick="handleCommand('close file manager')"><i class="fas fa-folder"></i> File Manager</li>
+            <li onclick="handleCommand('close word')"><i class="fas fa-file-word"></i> Word</li>
+            <li onclick="handleCommand('close excel')"><i class="fas fa-file-excel"></i> Excel</li>
+            <li onclick="handleCommand('close chatgpt')"><i class="fas fa-robot"></i> ChatGPT</li>
+            <li onclick="handleCommand('close manipal university')"><i class="fas fa-university"></i> Manipal University
+            </li>
+            <li onclick="handleCommand('close setting')"><i class="fas fa-cog"></i> Setting</li>
+            <li onclick="handleCommand('close paint')"><i class="fas fa-paint-brush"></i> Paint</li>
+            <li onclick="handleCommand('close control panel')"><i class="fas fa-tools"></i> Control Panel</li>
+            <li onclick="handleCommand('close instagram')"><i class="fab fa-instagram"></i> Instagram</li>
+            <li onclick="handleCommand('close github')"><i class="fab fa-github"></i> GitHub</li>
+            <li onclick="handleCommand('close linkdin')"><i class="fab fa-linkedin"></i> LinkedIn</li>
+            <li onclick="handleCommand('close facebook')"><i class="fab fa-facebook"></i> Facebook</li>
+            <li onclick="handleCommand('close amazon')"><i class="fab fa-amazon"></i> Amazon</li>
+          </ul>
+        </li>
+
+        <li class="submenu">
+          <i class="fas fa-microphone"></i> Speaking Commands
+          <ul class="submenu-list">
+            <li onclick="handleCommand('ask with ai')"><i class="fas fa-brain"></i> Ask with AI {query}</li>
+            <li onclick="handleCommand('search on youtube')"><i class="fab fa-youtube"></i> Search on YouTube</li>
+            <li onclick="handleCommand('search on google')"><i class="fas fa-search"></i> Search on Google</li>
+            <li onclick="handleCommand('weather')"><i class="fas fa-cloud-sun"></i> Weather {state}</li>
+            <li onclick="handleCommand('calculate')"><i class="fas fa-calculator"></i> Calculate {expression}</li>
+            <li onclick="handleCommand('wikipedia')"><i class="fab fa-wikipedia-w"></i> Wikipedia</li>
+            <li onclick="handleCommand('play music on youtube')"><i class="fas fa-music"></i> Play Music on YouTube</li>
+            <li onclick="handleCommand('location')"><i class="fas fa-map-marker-alt"></i> Location {map}</li>
+            <li onclick="handleCommand('meaning')"><i class="fas fa-book"></i> Meaning {word}</li>
+            <li onclick="handleCommand('search')"><i class="fas fa-search"></i> Search /who/what is</li>
+            <li onclick="handleCommand('lucy')"><i class="fas fa-star"></i> Lucy</li>
+          </ul>
+        </li>
+
+        <li class="submenu">
+          <i class="fas fa-handshake"></i> Greetings
+          <ul class="submenu-list">
+            <li onclick="handleCommand('hello')"><i class="fas fa-smile"></i> Hello</li>
+            <li onclick="handleCommand('good morning')"><i class="fas fa-sun"></i> Good Morning</li>
+            <li onclick="handleCommand('good night')"><i class="fas fa-moon"></i> Good Night</li>
+            <li onclick="handleCommand('thank you')"><i class="fas fa-hands-helping"></i> Thank You</li>
+            <li onclick="handleCommand('bye')"><i class="fas fa-wave-hand"></i> Bye</li>
+            <li onclick="handleCommand('love you')"><i class="fas fa-heart"></i> Love You</li>
+            <li onclick="handleCommand('how are you')"><i class="fas fa-smile-beam"></i> How are you?</li>
+            <li onclick="handleCommand('i am fine')"><i class="fas fa-thumbs-up"></i> I am fine</li>
+            <li onclick="handleCommand('nice to meet you')"><i class="fas fa-handshake"></i> Nice to meet you</li>
+          </ul>
+        </li>
+
+        <li class="submenu">
+          <i class="fas fa-info-circle"></i> System & Info
+          <ul class="submenu-list">
+            <li onclick="handleCommand('what is the time')"><i class="fas fa-clock"></i> Time</li>
+            <li onclick="handleCommand('date')"><i class="fas fa-clock"></i> Date</li>
+            <li onclick="handleCommand('who invented you')"><i class="fas fa-user-tie"></i> Who Invented You</li>
+            <li onclick="handleCommand('what is your name')"><i class="fas fa-id-card"></i> What is Your Name</li>
+            <li onclick="handleCommand('who are you')"><i class="fas fa-robot"></i> Who Are You</li>
+            <li onclick="handleCommand('latest news')"><i class="fas fa-newspaper"></i> News</li>
+            <li onclick="handleCommand('give me advice')"><i class="fas fa-lightbulb"></i> Advice</li>
+            <li onclick="handleCommand('take screenshot')"><i class="fas fa-camera"></i> Take Screenshot</li>
+            <li onclick="handleCommand('system information')"><i class="fas fa-info-circle"></i> System Information</li>
+          </ul>
+        </li>
+
+        <li class="submenu" onclick="window.open('/pdf/', '_blank')">
+          <i class="fas fa-file-pdf"></i> PDF Converter
+        </li>
+
+        <li class="submenu" onclick="window.open('/speech/', '_blank')">
+          <i class="fas fa-microphone-alt"></i> Speech Recognition
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <button id="toggleHistory" class="history-toggle-btn">
+    <i class="fas fa-history"></i>
+    <span>Show History</span>
+  </button>
+  <div id="historyPanel" class="history-panel hidden"></div>
+
+  <spline-viewer url="https://prod.spline.design/dxHeO7h7NgywufKC/scene.splinecode"></spline-viewer>
+  <div class="mic" id="mic">
+    <i class="mic-icon"></i>
+    <div class="mic-shadow"></div>
+  </div>
+  <div class="container" id="container">
+    <p id="words"></p>
+  </div>
+  <div id="response"></div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const micButton = document.getElementById('mic');
+      const container = document.getElementById('container');
+      const wordsElement = document.getElementById('words');
+      const toggleHistoryBtn = document.getElementById('toggleHistory');
+      const historyPanel = document.getElementById('historyPanel');
+      const hamburger = document.getElementById('hamburger');
+      const menuContent = document.getElementById('menuContent');
+      const toggleMenu = document.getElementById('toggleMenu');
+      const profileBtn = document.getElementById('profileBtn');
+      const profileDropdown = document.getElementById('profileDropdown');
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      let isListening = false;
+      let history = [];
+
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.continuous = false;
+
+      // Profile dropdown toggle
+      profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        profileDropdown.classList.toggle('show');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+          profileDropdown.classList.remove('show');
+        }
+      });
+
+      // Click to toggle menu
+      hamburger.addEventListener('click', () => {
+        const isVisible = menuContent.style.display === 'block';
+        menuContent.style.display = isVisible ? 'none' : 'block';
+        if (isVisible) {
+          menuContent.classList.remove('clicked');
+        } else {
+          menuContent.classList.add('clicked');
+        }
+      });
+
+      // Hover to show menu
+      toggleMenu.addEventListener('mouseenter', () => {
+        menuContent.style.display = 'block';
+      });
+
+      toggleMenu.addEventListener('mouseleave', () => {
+        if (!menuContent.classList.contains('clicked')) {
+          menuContent.style.display = 'none';
+        }
+      });
+
+      // AI Command Click Handlers
+      window.handleCommand = function (command) {
+        wordsElement.innerText = `You: ${command}`;
+        fetch('/execute_command', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: command }),
+        })
+          .then(response => response.json())
+          .then(data => {
+            wordsElement.innerText += `\nAI: ${data.ai_response}`;
+            document.dispatchEvent(new CustomEvent('speak', { detail: data.ai_response }));
+            addToHistory(command, data.ai_response);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+      };
+
+      // Mic Toggle Logic
+      micButton.addEventListener('click', () => {
+        isListening = !isListening;
+        micButton.classList.toggle('active');
+
+        if (isListening) {
+          container.style.display = 'block';
+          wordsElement.innerText = 'Listening...';
+          recognition.start();
+
+          recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            wordsElement.innerText = `${transcript}`;
+            fetch('/execute_command', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ text: transcript.trim() }),
+            })
+              .then(response => response.json())
+              .then(data => {
+                wordsElement.innerText += `\n${data.ai_response}`;
+                document.dispatchEvent(new CustomEvent('speak', { detail: data.ai_response }));
+                addToHistory(transcript, data.ai_response);
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+          };
+
+          recognition.onerror = (event) => {
+            console.error('Error:', event.error);
+            stopRecognition();
+          };
+
+          recognition.onend = () => {
+            if (isListening) recognition.start();
+          };
+
+        } else {
+          stopRecognition();
+        }
+      });
+
+      function stopRecognition() {
+        recognition.stop();
+        isListening = false;
+        micButton.classList.remove('active');
+        wordsElement.innerText = 'Click the mic to start listening.';
+      }
+
+      document.addEventListener('speak', function (event) {
+        wordsElement.innerText = event.detail;
+      });
+
+      function addToHistory(user, ai) {
+        history.push({ user, ai });
+        renderHistory();
+      }
+
+      function renderHistory() {
+        historyPanel.innerHTML = history.map(item => `
+          <div class="history-item">
+            <span class="history-user"><i class="fas fa-user"></i> You: ${item.user}</span>
+            <span class="history-ai">${item.ai}</span>
+          </div>
+        `).join('');
+      }
+
+      toggleHistoryBtn.addEventListener('click', () => {
+        const hidden = historyPanel.classList.toggle('hidden');
+        toggleHistoryBtn.innerHTML = hidden
+          ? '<i class="fas fa-history"></i> <span>Show History</span>'
+          : '<i class="fas fa-times"></i> <span>Hide History</span>';
+      });
+    });
+
+  </script>
+
+</body>
+
+</html>

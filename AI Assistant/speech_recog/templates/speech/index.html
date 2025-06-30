@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Recognition</title>
+    <link rel="stylesheet" href="{{ url_for('speech.static', filename='styles.css') }}">
+</head>
+
+<body>
+    <h1>Speech Recognition</h1>
+    <div class="mic" id="mic">
+        <i class="mic-icon"></i>
+        <div class="mic-shadow"></div>
+    </div>
+    <p id="transcript"></p>
+
+    <!-- Toggle Menu -->
+    <div id="toggleMenu" class="toggle-menu">
+        <div class="hamburger" id="hamburger">☰</div>
+        <div class="menu-content" id="menuContent">
+            <button id="downloadTranscript">Download Transcript</button>
+            <button id="startRecording">Start Recording</button>
+            <button id="stopRecording" disabled>Stop & Save Audio</button>
+        </div>
+    </div>
+
+    <!-- Transcript -->
+    <div id="transcriptContainer">
+        <div id="transcript"></div>
+    </div>
+
+    <!-- Audio playback -->
+    <div id="audioContainer">
+        <audio id="audioPlayback" controls></audio>
+        <span id="closeAudio">✖</span>
+    </div>
+
+    <script src="{{ url_for('speech.static', filename='scripts.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Converter Pro</title>
+
+  <!-- ✅ Correct CSS path using blueprint static -->
+  <link rel="stylesheet" href="{{ url_for('pdf.static', filename='style.css') }}" />
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>PDF Converter Pro</h1>
+      <p>Convert text or images to professional PDF documents</p>
+    </header>
+
+    <!-- ✅ Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- 📝 PDF Conversion UI -->
+    <div class="converter-container">
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="text-tab">Text to PDF</button>
+        <button class="tab-btn" data-tab="image-tab">Images to PDF</button>
+      </div>
+
+      <!-- ✏️ TEXT TO PDF FORM -->
+      <div class="tab-content active" id="text-tab">
+        <form action="{{ url_for('pdf.pdf_home') }}" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="text_content">Enter your text:</label>
+            <textarea id="text_content" name="text_content" rows="10"
+              placeholder="Type or paste your text here..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-convert">
+            <i class="fas fa-file-pdf"></i> Convert to PDF
+          </button>
+        </form>
+      </div>
+
+      <!-- 🖼️ IMAGE TO PDF FORM -->
+      <div class="tab-content" id="image-tab">
+        <form action="{{ url_for('pdf.pdf_home') }}" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="file_upload">Select images (multiple allowed):</label>
+            <div class="file-upload-wrapper">
+              <input type="file" id="file_upload" name="file_upload" multiple accept="image/*" required />
+              <div class="file-upload-display">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Drag & drop files or click to browse</span>
+                <small>Supports JPG, PNG, GIF</small>
+              </div>
+              <div id="file-list" class="file-list"></div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-convert">
+            <i class="fas fa-file-pdf"></i> Merge to PDF
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ⭐ Feature Section -->
+    <div class="features">
+      <div class="feature-card">
+        <i class="fas fa-file-alt"></i>
+        <h3>Text to PDF</h3>
+        <p>Convert any text content into a well-formatted PDF document.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-images"></i>
+        <h3>Images to PDF</h3>
+        <p>Merge multiple images into a single PDF file with each image on its own page.</p>
+      </div>
+      <div class="feature-card">
+        <i class="fas fa-eye"></i>
+        <h3>Preview Before Download</h3>
+        <p>View your generated PDF before downloading to ensure it's perfect.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Correct JS link -->
+  <script src="{{ url_for('pdf.static', filename='script.js') }}"></script>
+</body>
+
+</html>
