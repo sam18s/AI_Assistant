@@ -27,12 +27,12 @@ import pyautogui
 from googletrans import Translator
 import webbrowser
 import urllib.parse
-from transformers import pipeline
+# from transformers import pipeline
 from pdf_converter.routes import pdf_bp
 from speech_recog.routes import speech_bp 
 
 # Load once at the start
-generator = pipeline("text-generation", model="gpt2")
+# generator = pipeline("text-generation", model="gpt2")
 
 
 # Initialize Flask app
@@ -182,12 +182,12 @@ def check_internet_speed():
     webbrowser.open("https://www.speedtest.net/")
     return "Opening Speedtest to check your internet speed."
 
-def chat_with_huggingface(prompt):
-    try:
-        response = generator(prompt, max_length=100, num_return_sequences=1)
-        return response[0]['generated_text']
-    except Exception as e:
-        return f"HuggingFace Error: {str(e)}"
+# def chat_with_huggingface(prompt):
+#     try:
+#         response = generator(prompt, max_length=100, num_return_sequences=1)
+#         return response[0]['generated_text']
+#     except Exception as e:
+#         return f"HuggingFace Error: {str(e)}"
 
 
 def set_alarm(alarm_time):
@@ -730,12 +730,12 @@ def execute_command():
         ai_response = f"Searching Google for {query}"
         webbrowser.open(f"https://www.google.com/search?q={query}")
         
-    elif 'lucy' in text or 'ai question' in text:
-        prompt = text.replace("ask ai", "").replace("ai question", "").strip()
-        if prompt:
-            ai_response = chat_with_huggingface(prompt)
-        else:
-            ai_response = "Please provide a full question to ask AI."
+    # elif 'lucy' in text or 'ai question' in text:
+    #     prompt = text.replace("ask ai", "").replace("ai question", "").strip()
+    #     if prompt:
+    #         ai_response = chat_with_huggingface(prompt)
+    #     else:
+    #         ai_response = "Please provide a full question to ask AI."
 
 
     print(f"AI Response: {ai_response}")
