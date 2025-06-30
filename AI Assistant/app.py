@@ -262,23 +262,23 @@ def search_nearby_places(place_type, location):
         return "Sorry, I couldn't find the location."
     
 
-from nltk.corpus import wordnet
-import nltk
-nltk.download('wordnet')
+# from nltk.corpus import wordnet
+# import nltk
+# nltk.download('wordnet')
 
-def get_word_meaning(word):
-    """
-    Get the first meaning of a word using WordNet.
-    """
-    try:
-        synsets = wordnet.synsets(word)
-        if synsets:
-            definition = synsets[0].definition()
-            return f"{word.capitalize()} means: {definition}"
-        else:
-            return f"Sorry, I couldn't find the meaning of '{word}'."
-    except Exception as e:
-        return f"Error while looking up the word: {str(e)}"
+# def get_word_meaning(word):
+#     """
+#     Get the first meaning of a word using WordNet.
+#     """
+#     try:
+#         synsets = wordnet.synsets(word)
+#         if synsets:
+#             definition = synsets[0].definition()
+#             return f"{word.capitalize()} means: {definition}"
+#         else:
+#             return f"Sorry, I couldn't find the meaning of '{word}'."
+#     except Exception as e:
+#         return f"Error while looking up the word: {str(e)}"
 
 
 
@@ -704,17 +704,17 @@ def execute_command():
             ai_response = f"Sorry, I couldn't search maps: {str(e)}"
 
 
-    elif "meaning of" in text or "define" in text or "what is" in text:
-        # Extract the word from the spoken sentence
-        word = ""
-        if "meaning of" in text:
-            word = text.split("meaning of")[-1].strip()
-        elif "define" in text:
-            word = text.split("define")[-1].strip()
-        elif "what is" in text:
-            word = text.split("what is")[-1].strip()
+    # elif "meaning of" in text or "define" in text or "what is" in text:
+    #     # Extract the word from the spoken sentence
+    #     word = ""
+    #     if "meaning of" in text:
+    #         word = text.split("meaning of")[-1].strip()
+    #     elif "define" in text:
+    #         word = text.split("define")[-1].strip()
+    #     elif "what is" in text:
+    #         word = text.split("what is")[-1].strip()
 
-        ai_response = get_word_meaning(word)
+    #     ai_response = get_word_meaning(word)
 
 
     elif "synonyms of" in text:

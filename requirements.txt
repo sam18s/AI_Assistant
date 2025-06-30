@@ -13,7 +13,6 @@ geopy==2.3.0
 PyDictionary==2.0.1
 transformers[torch]==4.28.1
 torch==2.7.1
-nltk==3.8.1
 psutil==5.9.5
 python-dotenv==1.0.0
 email-validator==2.0.0.post2
