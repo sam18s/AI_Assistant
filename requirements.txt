@@ -11,8 +11,7 @@ pyautogui==0.9.54
 googletrans==3.1.0a0
 geopy==2.3.0
 PyDictionary==2.0.1
-transformers==4.30.2
-# tokenizers line removed
+transformers==4.28.1
 torch==2.7.1
 nltk==3.8.1
 psutil==5.9.5
