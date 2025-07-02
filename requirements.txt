@@ -1,7 +1,7 @@
 Flask==2.3.2
 Flask-SQLAlchemy==3.0.5
 Werkzeug==2.3.7
-speechrecognition==3.10.0
+SpeechRecognition==3.10.0  # Fixed capitalization
 pyttsx3==2.90
 pywhatkit==5.4
 wikipedia==1.4.0
@@ -17,4 +17,4 @@ email-validator==2.0.0.post2
 fpdf2==2.7.4
 Pillow==10.4.0
 gunicorn==21.2.0
-
+pydub==0.25.1  # Changed from >= to exact version
