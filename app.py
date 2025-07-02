@@ -13,7 +13,7 @@ import os
 import re
 import wikipedia
 import pyjokes
-import pywhatkit
+# import pywhatkit
 import subprocess
 import platform
 import psutil
@@ -23,7 +23,7 @@ from email.mime.multipart import MIMEMultipart
 from geopy.geocoders import Nominatim
 from PyDictionary import PyDictionary
 import webbrowser
-import pyautogui
+# import pyautogui
 from googletrans import Translator
 import webbrowser
 import urllib.parse
@@ -48,9 +48,9 @@ db = SQLAlchemy(app)
 dictionary = PyDictionary()
 translator = Translator()
 
-# Email configuration (replace with your email credentials)
-EMAIL_ADDRESS = "your_email@example.com"
-EMAIL_PASSWORD = "your_email_password"
+# # Email configuration (replace with your email credentials)
+# EMAIL_ADDRESS = "your_email@example.com"
+# EMAIL_PASSWORD = "your_email_password"
 
 def speak(text):
     """Simultaneously speak and print the given text."""
@@ -168,16 +168,27 @@ def close_program(program_name):
     except Exception as e:
         return f"Sorry, I couldn't close {program_name}."
     
+# def play_music_on_youtube():
+#     speak("Which song do you want to play?")
+#     song = take_command()
+#     if song:
+#         speak(f"Playing {song} on YouTube.")
+#         pywhatkit.playonyt(song)
+#         return f"Playing {song} on YouTube."
+#     else:
+#         return "Sorry, I didn't catch the song name."
+
 def play_music_on_youtube():
     speak("Which song do you want to play?")
     song = take_command()
     if song:
-        speak(f"Playing {song} on YouTube.")
-        pywhatkit.playonyt(song)
-        return f"Playing {song} on YouTube."
+        speak(f"Opening YouTube search for {song}.")
+        # Open YouTube search in browser instead of playing directly
+        webbrowser.open(f"https://www.youtube.com/results?search_query={song.replace(' ', '+')}")
+        return f"Searching YouTube for {song}."
     else:
         return "Sorry, I didn't catch the song name."
-
+    
 def check_internet_speed():
     webbrowser.open("https://www.speedtest.net/")
     return "Opening Speedtest to check your internet speed."
@@ -236,21 +247,21 @@ def convert_currency(amount, from_currency, to_currency):
     except Exception as e:
         return "Sorry, I couldn't convert the currency."
 
-def send_email(to, subject, body):
-    try:
-        msg = MIMEMultipart()
-        msg['From'] = EMAIL_ADDRESS
-        msg['To'] = to
-        msg['Subject'] = subject
-        msg.attach(MIMEText(body, 'plain'))
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-        server.sendmail(EMAIL_ADDRESS, to, msg.as_string())
-        server.quit()
-        return "Email sent successfully."
-    except Exception as e:
-        return f"Failed to send email: {e}"
+# def send_email(to, subject, body):
+#     try:
+#         msg = MIMEMultipart()
+#         msg['From'] = EMAIL_ADDRESS
+#         msg['To'] = to
+#         msg['Subject'] = subject
+#         msg.attach(MIMEText(body, 'plain'))
+#         server = smtplib.SMTP('smtp.gmail.com', 587)
+#         server.starttls()
+#         server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+#         server.sendmail(EMAIL_ADDRESS, to, msg.as_string())
+#         server.quit()
+#         return "Email sent successfully."
+#     except Exception as e:
+#         return f"Failed to send email: {e}"
 
 def search_nearby_places(place_type, location):
     geolocator = Nominatim(user_agent="assistant")
@@ -418,26 +429,36 @@ def execute_command():
     if "how are you" in text or "kaise ho" in text:
         ai_response = "I am absolutely fine. What about you?"
     
+    # elif "ask with ai" in text:
+    #     query = text.replace("ask with ai", "").strip()
+
+    #     if query:
+    #         speak(f"Asking AI: {query}")
+
+    #         # Open ChatGPT in browser
+    #         webbrowser.open("https://chat.openai.com/chat")
+
+    #         # Wait for browser to load completely (adjust if needed)
+    #         time.sleep(8)
+
+    #         # Type the query and press Enter
+    #         pyautogui.write(query, interval=0.05)
+    #         pyautogui.press("enter")
+
+    #         speak("Your query has been automatically typed into ChatGPT.")
+    #     else:
+    #         speak("You said 'ask with AI', but didn't specify your question. Please say the full query.")
+
+
     elif "ask with ai" in text:
         query = text.replace("ask with ai", "").strip()
-
         if query:
             speak(f"Asking AI: {query}")
-
-            # Open ChatGPT in browser
-            webbrowser.open("https://chat.openai.com/chat")
-
-            # Wait for browser to load completely (adjust if needed)
-            time.sleep(8)
-
-            # Type the query and press Enter
-            pyautogui.write(query, interval=0.05)
-            pyautogui.press("enter")
-
-            speak("Your query has been automatically typed into ChatGPT.")
+            # Just open ChatGPT without automation
+            webbrowser.open(f"https://chat.openai.com/?q={query}")
+            speak("I've opened ChatGPT in your browser. You can now ask your question there.")
         else:
             speak("You said 'ask with AI', but didn't specify your question. Please say the full query.")
-
 
     # Open VS Code
     elif "open vs code" in text:
@@ -594,26 +615,26 @@ def execute_command():
     elif 'joke' in text:
         ai_response = pyjokes.get_joke()
     
-    # Take Screenshot
-    elif "take screenshot" in text or "screenshot" in text:
-        try:
-            # Get path to Downloads folder
-            downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+    # # Take Screenshot
+    # elif "take screenshot" in text or "screenshot" in text:
+    #     try:
+    #         # Get path to Downloads folder
+    #         downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
             
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            filename = f"screenshot_{timestamp}.png"
-            screenshot_path = os.path.join(downloads_path, filename)
+    #         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    #         filename = f"screenshot_{timestamp}.png"
+    #         screenshot_path = os.path.join(downloads_path, filename)
 
-            # Take and save screenshot
-            screenshot = pyautogui.screenshot()
-            screenshot.save(screenshot_path)
+    #         # Take and save screenshot
+    #         screenshot = pyautogui.screenshot()
+    #         screenshot.save(screenshot_path)
 
-            # Optional: Open the screenshot after saving
-            os.startfile(screenshot_path)
+    #         # Optional: Open the screenshot after saving
+    #         os.startfile(screenshot_path)
 
-            ai_response = f"Screenshot saved in Downloads as {filename}."
-        except Exception as e:
-            ai_response = f"Failed to take screenshot: {str(e)}"
+    #         ai_response = f"Screenshot saved in Downloads as {filename}."
+    #     except Exception as e:
+    #         ai_response = f"Failed to take screenshot: {str(e)}"
 
     elif "play music on youtube" in text:
         ai_response = play_music_on_youtube()
@@ -672,14 +693,14 @@ def execute_command():
         to_currency = take_command().upper()
         ai_response = convert_currency(amount, from_currency, to_currency)
 
-    elif "send email" in text:
-        ai_response = "To whom should I send the email?"
-        to = input("Enter recipient's email: ").strip()
-        ai_response = "What is the subject?"
-        subject = take_command()
-        ai_response = "What should I write in the email?"
-        body = take_command()
-        ai_response = send_email(to, subject, body)
+    # elif "send email" in text:
+    #     ai_response = "To whom should I send the email?"
+    #     to = input("Enter recipient's email: ").strip()
+    #     ai_response = "What is the subject?"
+    #     subject = take_command()
+    #     ai_response = "What should I write in the email?"
+    #     body = take_command()
+    #     ai_response = send_email(to, subject, body)
     
     elif "nearby" in text or "find" in text or "location" in text:
         try:
